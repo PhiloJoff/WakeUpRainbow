@@ -10,9 +10,9 @@ namespace WakeUpRainbow.Entities
 {
     public class ColorFood : GameEntity
     {
-        private int defaultWidth = 8;
-        private int defaultHeight = 8;
-        private bool _isActive;
+        public static int defaultWidth = 8;
+        public static int defaultHeight = 8;
+        private bool _isActive = true;
         public bool IsActive { get => _isActive; set => _isActive = value; }
         public ColorFood(Texture2D texture2D) : base(texture2D)
         {
@@ -57,17 +57,14 @@ namespace WakeUpRainbow.Entities
 
         public static ColorFood CreateColorFood(Texture2D texture2D, Color color, int PosMaxX, int PosMaxY)
         {
-            ColorFood colorFood = new ColorFood(texture2D)
+            Random random = new Random(DateTime.Now.Millisecond);
+            int posX = random.Next(0, PosMaxX - defaultWidth);
+            int posY = random.Next(0, PosMaxY - defaultHeight);
+            ColorFood colorFood = new ColorFood(texture2D, new Vector2(posX, posY))
             {
                 Color = color
             };
 
-            Random random = new Random(DateTime.Now.Millisecond);
-            int posX = random.Next(0 + colorFood.Width, PosMaxX - colorFood.Width);
-            int posY = random.Next(0 + colorFood.Height, PosMaxY - colorFood.Height);
-
-            colorFood.Pos = new Vector2(posX, posY);
-            Debug.WriteLine(colorFood.Pos);
             return colorFood;
         }
     }
