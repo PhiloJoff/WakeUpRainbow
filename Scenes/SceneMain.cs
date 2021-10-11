@@ -13,7 +13,7 @@ namespace WakeUpRainbow.Scenes
 {
     public class SceneMain : Scene
     {
-        
+
         protected Cloud _cloud;
         /*protected ColorFood _colorFood;*/
         protected List<ColorFood> _colorFoods;
@@ -101,19 +101,19 @@ namespace WakeUpRainbow.Scenes
             {
                 foreach (ColorFood colorFood in _colorFoods)
                 {
-                    if (PhiloUtils.IsColide(_cloud.Rectangle, colorFood.Rectangle))
+                    if (PhiloUtils.IsColide((int) _cloud.Pos.X, (int)_cloud.Pos.Y, _cloud.Width, _cloud.Height, (int)colorFood.Pos.X, (int)colorFood.Pos.Y, colorFood.Width, colorFood.Height))
                     {
                         _cloud.Color = colorFood.Color;
                         _entityManager.RemoveEntity(colorFood);
                         _colorFoods.Remove(colorFood);
+                        _currentFoods--;
                         break;
                     }
 
                 }
-                Debug.WriteLine($"Nombre d'entité : {_entityManager.Count()}");
             }
-
-            GenerateFoods(gameTime);
+            if (_currentFoods < _maxCurrentFoods)
+                GenerateFoods(gameTime);
 
         }
 
@@ -124,8 +124,6 @@ namespace WakeUpRainbow.Scenes
 
         private void GenerateFoods(GameTime gameTime)
         {
-            if (_currentFoods < _maxCurrentFoods)
-            {
                 Random random = new Random(DateTime.Now.Millisecond);
                 //Premiere generatation de foods
                 if (_nextSpawnColorTime == 0)
@@ -136,7 +134,7 @@ namespace WakeUpRainbow.Scenes
                     _entityManager.AddEntity(colorFood);
                     _nextSpawnColorTime = random.Next(1000, 4500);
                     _currentFoods = _colorFoods.Count;
-                } 
+                }
                 else
                 {
                     _currentTimeElapsed += gameTime.ElapsedGameTime.Milliseconds;
@@ -150,7 +148,7 @@ namespace WakeUpRainbow.Scenes
                     }
                 }
 
-            }
+            
         }
 
 
