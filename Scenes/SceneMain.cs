@@ -6,6 +6,7 @@ using PhiloEngine.src;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using WakeUpRainbow.Entities;
 
@@ -112,10 +113,18 @@ namespace WakeUpRainbow.Scenes
                     {
                         _cloud.Color = colorFood.Color;
 
-                        if (_eatColors[0] == null)
+                        if (_eatColors[0] == Color.Transparent)
+                        {
                             _eatColors[0] = colorFood.Color;
+                        }
                         else
+                        {
                             _eatColors[1] = colorFood.Color;
+                            Color combinationColor = GetCombination(_eatColors);
+                            if (!_availableColors.Contains(combinationColor))
+                                _availableColors.Add(combinationColor);
+                            _eatColors = new Color[2];
+                        }
 
                         _entityManager.RemoveEntity(colorFood);
                         _colorFoods.Remove(colorFood);
@@ -178,6 +187,24 @@ namespace WakeUpRainbow.Scenes
                 { "Purple", new List<Color> { Color.Red, Color.Blue } }
             };
         }
+
+        //Return Color.White if combination is not available
+        private Color GetCombination(Color[] colors)
+        {
+            if (colors.Length != 2)
+                throw new Exception();
+            List<Color> colorsList = new List<Color> { colors[0], colors[1] };
+
+            foreach (KeyValuePair<string, List<Color>> keyValue in _colorCombinations)
+            {
+                if(PhiloUtils.UnorderedEqual(keyValue.Value, colorsList))
+                {
+                    return PhiloUtils.GetColorByName(keyValue.Key);
+                }
+            }
+            return Color.Transparent;
+        }
+
 
 
     }
