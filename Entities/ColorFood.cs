@@ -66,8 +66,6 @@ namespace WakeUpRainbow.Entities
                 Color = color
             };
 
-
-            Debug.WriteLine(colorFood.Pos);
             return colorFood;
         }
     }
