@@ -15,15 +15,17 @@ namespace WakeUpRainbow.Scenes
     {
 
         protected Cloud _cloud;
-        /*protected ColorFood _colorFood;*/
         protected List<ColorFood> _colorFoods;
         private List<Color> _availableColors;
-        private int _maxCurrentFoods = 3;
+        private readonly int _maxCurrentFoods = 3;
         private int _currentFoods = 0;
         private int _nextSpawnColorTime = 0;
         private int _currentTimeElapsed = 0;
 
         private Texture2D _textureFood;
+
+        //Combinaison de couleur possible
+        private Dictionary<string, List<Color>> _colorCombinations;
 
         public SceneMain(MainGame mainGame) : base(mainGame)
         {
@@ -35,6 +37,8 @@ namespace WakeUpRainbow.Scenes
 
             _availableColors = new List<Color> { Color.Red, Color.Blue, Color.Green };
 
+            //initialisation des couleurs
+            _initCombination();
             Load();
         }
 
@@ -149,6 +153,20 @@ namespace WakeUpRainbow.Scenes
                 }
 
             
+        }
+
+        private void _initCombination()
+        {
+            _colorCombinations = new Dictionary<string, List<Color>>();
+
+            _colorCombinations.Add("Red", new List<Color> { Color.Red, Color.Red });
+            _colorCombinations.Add("Blue", new List<Color> { Color.Blue, Color.Blue });
+            _colorCombinations.Add("Green", new List<Color> { Color.Green, Color.Green });
+
+            _colorCombinations.Add("Yellow", new List<Color> { Color.Green, Color.Red });
+            _colorCombinations.Add("Orange", new List<Color> { Color.Red, Color.Yellow });
+            _colorCombinations.Add("Cyan", new List<Color> { Color.Blue, Color.Green });
+            _colorCombinations.Add("Purple", new List<Color> { Color.Red, Color.Blue });
         }
 
 
