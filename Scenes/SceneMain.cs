@@ -27,6 +27,8 @@ namespace WakeUpRainbow.Scenes
         //Combinaison de couleur possible
         private Dictionary<string, List<Color>> _colorCombinations;
 
+        private Color[] _eatColors;
+
         public SceneMain(MainGame mainGame) : base(mainGame)
         {
             _textureFood = PhiloUtils.CreateTexture2D(mainGame.GraphicsDevice, 30, 30);
@@ -37,6 +39,7 @@ namespace WakeUpRainbow.Scenes
 
             _availableColors = new List<Color> { Color.Red, Color.Blue, Color.Green };
 
+            _eatColors = new Color[2];
             //initialisation des couleurs
             _initCombination();
             Load();
@@ -108,6 +111,12 @@ namespace WakeUpRainbow.Scenes
                     if (PhiloUtils.IsColide((int) _cloud.Pos.X, (int)_cloud.Pos.Y, _cloud.Width, _cloud.Height, (int)colorFood.Pos.X, (int)colorFood.Pos.Y, colorFood.Width, colorFood.Height))
                     {
                         _cloud.Color = colorFood.Color;
+
+                        if (_eatColors[0] == null)
+                            _eatColors[0] = colorFood.Color;
+                        else
+                            _eatColors[1] = colorFood.Color;
+
                         _entityManager.RemoveEntity(colorFood);
                         _colorFoods.Remove(colorFood);
                         _currentFoods--;
@@ -157,16 +166,17 @@ namespace WakeUpRainbow.Scenes
 
         private void _initCombination()
         {
-            _colorCombinations = new Dictionary<string, List<Color>>();
+            _colorCombinations = new Dictionary<string, List<Color>>
+            {
+                { "Red", new List<Color> { Color.Red, Color.Red } },
+                { "Blue", new List<Color> { Color.Blue, Color.Blue } },
+                { "Green", new List<Color> { Color.Green, Color.Green } },
 
-            _colorCombinations.Add("Red", new List<Color> { Color.Red, Color.Red });
-            _colorCombinations.Add("Blue", new List<Color> { Color.Blue, Color.Blue });
-            _colorCombinations.Add("Green", new List<Color> { Color.Green, Color.Green });
-
-            _colorCombinations.Add("Yellow", new List<Color> { Color.Green, Color.Red });
-            _colorCombinations.Add("Orange", new List<Color> { Color.Red, Color.Yellow });
-            _colorCombinations.Add("Cyan", new List<Color> { Color.Blue, Color.Green });
-            _colorCombinations.Add("Purple", new List<Color> { Color.Red, Color.Blue });
+                { "Yellow", new List<Color> { Color.Green, Color.Red } },
+                { "Orange", new List<Color> { Color.Red, Color.Yellow } },
+                { "Cyan", new List<Color> { Color.Blue, Color.Green } },
+                { "Purple", new List<Color> { Color.Red, Color.Blue } }
+            };
         }
 
 
