@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using PhiloEngine;
 using PhiloEngine.src;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -29,6 +30,9 @@ namespace WakeUpRainbow.Scenes
         private Dictionary<string, List<Color>> _colorCombinations;
 
         private Color[] _eatColors;
+
+        private List<Color> _eatColorsOrder;
+        private List<Color> _eatColorsCurrent;
 
         public SceneMain(MainGame mainGame) : base(mainGame)
         {
@@ -113,6 +117,7 @@ namespace WakeUpRainbow.Scenes
                     {
                         _cloud.Color = colorFood.Color;
 
+                        // Check if the first element is null (== Color.Transparent)
                         if (_eatColors[0] == Color.Transparent)
                         {
                             _eatColors[0] = colorFood.Color;
@@ -122,7 +127,19 @@ namespace WakeUpRainbow.Scenes
                             _eatColors[1] = colorFood.Color;
                             Color combinationColor = GetCombination(_eatColors);
                             if (!_availableColors.Contains(combinationColor))
-                                _availableColors.Add(combinationColor);
+                            {
+                                if(!_availableColors.Contains(combinationColor))
+                                    _availableColors.Add(combinationColor);
+
+                                if (combinationColor == _eatColorsOrder[_eatColorsCurrent.Count])
+                                {
+                                    _eatColorsCurrent.Add(combinationColor);
+
+                                }
+                                Debug.WriteLine(_eatColorsCurrent.Count);
+                            }
+
+                            //Reinitialize the array of eatFood
                             _eatColors = new Color[2];
                         }
 
@@ -142,6 +159,27 @@ namespace WakeUpRainbow.Scenes
         public override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
+        }
+
+        private void _initCombination()
+        {
+            _colorCombinations = new Dictionary<string, List<Color>>
+            {
+                { "Red", new List<Color> { Color.Red, Color.Red } },
+                { "Blue", new List<Color> { Color.Blue, Color.Blue } },
+                { "Green", new List<Color> { Color.Green, Color.Green } },
+                { "Yellow", new List<Color> { Color.Green, Color.Red } },
+                { "Orange", new List<Color> { Color.Red, Color.Yellow } },
+                { "Cyan", new List<Color> { Color.Blue, Color.Green } },
+                { "Purple", new List<Color> { Color.Red, Color.Blue } }
+            };
+
+            _eatColorsOrder = new List<Color>()
+            {
+                Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Purple
+            };
+
+            _eatColorsCurrent = new List<Color>();
         }
 
         private void GenerateFoods(GameTime gameTime)
@@ -173,22 +211,8 @@ namespace WakeUpRainbow.Scenes
             
         }
 
-        private void _initCombination()
-        {
-            _colorCombinations = new Dictionary<string, List<Color>>
-            {
-                { "Red", new List<Color> { Color.Red, Color.Red } },
-                { "Blue", new List<Color> { Color.Blue, Color.Blue } },
-                { "Green", new List<Color> { Color.Green, Color.Green } },
 
-                { "Yellow", new List<Color> { Color.Green, Color.Red } },
-                { "Orange", new List<Color> { Color.Red, Color.Yellow } },
-                { "Cyan", new List<Color> { Color.Blue, Color.Green } },
-                { "Purple", new List<Color> { Color.Red, Color.Blue } }
-            };
-        }
-
-        //Return Color.White if combination is not available
+        //Return Color.Transparent if combination is not available
         private Color GetCombination(Color[] colors)
         {
             if (colors.Length != 2)
