@@ -19,6 +19,9 @@ namespace WakeUpRainbow
         protected override void Initialize()
         {
             base.Initialize();
+            _graphics.PreferredBackBufferWidth = 960;  // set this value to the desired width of your window
+            _graphics.PreferredBackBufferHeight = 540;   // set this value to the desired height of your window
+            _graphics.ApplyChanges();
             MainScene = new SceneMain(this);
             GameState.SwitchScene(MainScene);
 
