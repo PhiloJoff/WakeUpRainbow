@@ -69,37 +69,45 @@ namespace WakeUpRainbow.Scenes
 
             if (_inputManager.KeyDown(Keys.Left))
             {
-                if (_cloud.Pos.X > 0)
+                if (_cloud.Pos.X >= 0)
                 {
                     _cloud.IsMovedX = true;
                     _cloud.ToMove(Cloud.Move.Left);
+                    if (_cloud.Pos.X < 0)
+                        _cloud.Pos = new Vector2(0, _cloud.Pos.Y);
                 }
             }
 
             if (_inputManager.KeyDown(Keys.Right))
             {
-                if (_cloud.Pos.X < _mainGame.Graphics.PreferredBackBufferWidth - _cloud.Width)
+                if (_cloud.Pos.X <= _mainGame.Graphics.PreferredBackBufferWidth - _cloud.Width)
                 {
                     _cloud.IsMovedX = true;
                     _cloud.ToMove(Cloud.Move.Right);
+                    if (_cloud.Pos.X > _mainGame.Graphics.PreferredBackBufferWidth - _cloud.Width)
+                        _cloud.Pos = new Vector2(_mainGame.Graphics.PreferredBackBufferWidth - _cloud.Width, _cloud.Pos.Y);
                 }
             }
 
             if (_inputManager.KeyDown(Keys.Up))
             {
-                if (_cloud.Pos.Y > 0)
+                if (_cloud.Pos.Y >= 0)
                 {
                     _cloud.IsMovedY = true;
                     _cloud.ToMove(Cloud.Move.Up);
+                    if (_cloud.Pos.Y < 0)
+                        _cloud.Pos = new Vector2(_cloud.Pos.X, 0);
                 }
             }
 
             if (_inputManager.KeyDown(Keys.Down))
             {
-                if (_cloud.Pos.Y < _mainGame.Graphics.PreferredBackBufferHeight - _cloud.Height)
+                if (_cloud.Pos.Y <= _mainGame.Graphics.PreferredBackBufferHeight - _cloud.Height)
                 {
                     _cloud.IsMovedY = true;
                     _cloud.ToMove(Cloud.Move.Down);
+                    if (_cloud.Pos.Y > _mainGame.Graphics.PreferredBackBufferHeight - _cloud.Height)
+                        _cloud.Pos = new Vector2( _cloud.Pos.X, _mainGame.Graphics.PreferredBackBufferHeight - _cloud.Height);
                 }
             }
 
