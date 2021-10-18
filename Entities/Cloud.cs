@@ -19,30 +19,30 @@ namespace WakeUpRainbow.Entities
             _pos = pos;
         }
 
-        public void ToMove(Move move)
+        public void ToMove(Movement move)
         {
             switch (move)
             {
-                case Move.None:
+                case Movement.None:
                     _isMovedX = false;
                     _isMovedY = false;
                     break;
-                case Move.Left:
+                case Movement.Left:
                     _isMovedX = true;
                     _speedX += (_speedX * _acceleration);
                     _pos.X -= _speedX;
                     break;
-                case Move.Right:
+                case Movement.Right:
                     _isMovedX = true;
                     _speedX += (_speedX * _acceleration);
                     _pos.X += _speedX;
                     break;
-                case Move.Up:
+                case Movement.Up:
                     _isMovedY = true;
                     _speedY += (_speedY * _acceleration);
                     _pos.Y -= _speedY;
                     break;
-                case Move.Down:
+                case Movement.Down:
                     _isMovedY = true;
                     _speedY += (_speedY * _acceleration);
                     _pos.Y += _speedY;
