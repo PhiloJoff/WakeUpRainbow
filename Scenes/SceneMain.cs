@@ -123,21 +123,20 @@ namespace WakeUpRainbow.Scenes
                 {
                     if (PhiloUtils.IsColide((int) _cloud.Pos.X, (int)_cloud.Pos.Y, _cloud.Width, _cloud.Height, (int)colorFood.Pos.X, (int)colorFood.Pos.Y, colorFood.Width, colorFood.Height))
                     {
-                        _cloud.Color = colorFood.Color;
 
                         // Check if the first element is null (== Color.Transparent)
                         if (_eatColors[0] == Color.Transparent)
                         {
                             _eatColors[0] = colorFood.Color;
+                            _cloud.Color = colorFood.Color;
                         }
                         else
                         {
                             _eatColors[1] = colorFood.Color;
                             Color combinationColor = GetCombination(_eatColors);
-                            if (!_availableColors.Contains(combinationColor))
+                            if (!_availableColors.Contains(combinationColor) && combinationColor != Color.Transparent)
                             {
-                                if(!_availableColors.Contains(combinationColor))
-                                    _availableColors.Add(combinationColor);
+                                _availableColors.Add(combinationColor);
 
                                 if (combinationColor == _eatColorsOrder[_eatColorsCurrent.Count])
                                 {
@@ -149,11 +148,13 @@ namespace WakeUpRainbow.Scenes
 
                             //Reinitialize the array of eatFood
                             _eatColors = new Color[2];
+                            _cloud.Color = Color.White;
                         }
 
                         _entityManager.RemoveEntity(colorFood);
                         _colorFoods.Remove(colorFood);
-                        _currentFoods--;
+                        _currentFoods = _colorFoods.Count;
+                        Debug.WriteLine($"_currentFoods = {_currentFoods}");
                         break;
                     }
 
@@ -192,30 +193,19 @@ namespace WakeUpRainbow.Scenes
 
         private void GenerateFoods(GameTime gameTime)
         {
+            _currentTimeElapsed += gameTime.ElapsedGameTime.Milliseconds;
+            if (_currentTimeElapsed >= _nextSpawnColorTime)
+            {
                 Random random = new Random(DateTime.Now.Millisecond);
-                //Premiere generatation de foods
-                if (_nextSpawnColorTime == 0)
-                {
+                ColorFood colorFood = ColorFood.CreateColorFood(_textureFood, _availableColors[random.Next(_availableColors.Count)], _mainGame.Graphics.PreferredBackBufferWidth, _mainGame.Graphics.PreferredBackBufferHeight);
+                _colorFoods.Add(colorFood);
+                _entityManager.AddEntity(colorFood);
+                _currentTimeElapsed = 0;
+                _currentFoods = _colorFoods.Count;
+                Debug.WriteLine($"_currentFoods = {_currentFoods}");
+                _nextSpawnColorTime = random.Next(1000, 4500);
 
-                    ColorFood colorFood = ColorFood.CreateColorFood(_textureFood, _availableColors[random.Next(_availableColors.Count)], _mainGame.Graphics.PreferredBackBufferWidth, _mainGame.Graphics.PreferredBackBufferHeight);
-                    _colorFoods.Add(colorFood);
-                    _entityManager.AddEntity(colorFood);
-                    _nextSpawnColorTime = random.Next(1000, 4500);
-                    _currentFoods = _colorFoods.Count;
-                }
-                else
-                {
-                    _currentTimeElapsed += gameTime.ElapsedGameTime.Milliseconds;
-                    if (_currentTimeElapsed >= _nextSpawnColorTime)
-                    {
-                        ColorFood colorFood = ColorFood.CreateColorFood(_textureFood, _availableColors[random.Next(_availableColors.Count)], _mainGame.Graphics.PreferredBackBufferWidth, _mainGame.Graphics.PreferredBackBufferHeight);
-                        _colorFoods.Add(colorFood);
-                        _entityManager.AddEntity(colorFood);
-                        _currentTimeElapsed = 0;
-                        _currentFoods = _colorFoods.Count;
-                    }
-                }
-
+            }
             
         }
 
@@ -234,6 +224,8 @@ namespace WakeUpRainbow.Scenes
                     return PhiloUtils.GetColorByName(keyValue.Key);
                 }
             }
+
+            Debug.WriteLine("ERROR : GetCombination => Color not found");
             return Color.Transparent;
         }
 
