@@ -21,26 +21,34 @@ namespace WakeUpRainbow.Scenes
         private List<Color> _availableColors;
         private readonly int _maxCurrentFoods = 3;
         private int _currentFoods = 0;
+
+        //Gestion du temps pour spawn les foods
         private int _nextSpawnColorTime = 0;
         private int _currentTimeElapsed = 0;
 
-        private Texture2D _textureFood;
+        private Texture2D _texture;
 
         //Combinaison de couleur possible
         private Dictionary<string, List<Color>> _colorCombinations;
 
         private Color[] _eatColors;
-
+        
         private List<Color> _eatColorsOrder;
         private List<Color> _eatColorsCurrent;
 
+
+        private ScoreBoard _scoreBoard;
         public SceneMain(MainGame mainGame) : base(mainGame)
         {
-            _textureFood = PhiloUtils.CreateTexture2D(mainGame.GraphicsDevice, 30, 30);
-            _cloud = new Cloud(_textureFood, _textureFood.Width, _textureFood.Height);
+            _texture = PhiloUtils.CreateTexture2D(mainGame.GraphicsDevice, 30, 30, Color.White);
+            _cloud = new Cloud(_texture, _texture.Width, _texture.Height);
+
+            _texture = PhiloUtils.CreateBorderTexture2D(mainGame.GraphicsDevice, mainGame.Graphics.PreferredBackBufferWidth, 30, Color.Transparent, Color.White, 3);
+            _scoreBoard = new ScoreBoard(_texture, _texture.Width, _texture.Height);
 
             _colorFoods = new List<ColorFood>();
-            _textureFood = PhiloUtils.CreateTexture2D(mainGame.GraphicsDevice, ColorFood.defaultWidth, ColorFood.defaultHeight);
+            _texture = PhiloUtils.CreateTexture2D(mainGame.GraphicsDevice, ColorFood.defaultWidth, ColorFood.defaultHeight);
+
 
             _availableColors = new List<Color> { Color.Red, Color.Blue, Color.Green };
 
@@ -54,6 +62,7 @@ namespace WakeUpRainbow.Scenes
         {
             base.Load();
             _entityManager.AddEntity(_cloud);
+            _entityManager.AddEntity(_scoreBoard);
         }
 
         public override void Unload()
@@ -72,7 +81,7 @@ namespace WakeUpRainbow.Scenes
                 if (_cloud.Pos.X >= 0)
                 {
                     _cloud.IsMovedX = true;
-                    _cloud.ToMove(Cloud.Move.Left);
+                    _cloud.ToMove(Cloud.Movement.Left);
                     if (_cloud.Pos.X < 0)
                         _cloud.Pos = new Vector2(0, _cloud.Pos.Y);
                 }
@@ -83,7 +92,7 @@ namespace WakeUpRainbow.Scenes
                 if (_cloud.Pos.X <= _mainGame.Graphics.PreferredBackBufferWidth - _cloud.Width)
                 {
                     _cloud.IsMovedX = true;
-                    _cloud.ToMove(Cloud.Move.Right);
+                    _cloud.ToMove(Cloud.Movement.Right);
                     if (_cloud.Pos.X > _mainGame.Graphics.PreferredBackBufferWidth - _cloud.Width)
                         _cloud.Pos = new Vector2(_mainGame.Graphics.PreferredBackBufferWidth - _cloud.Width, _cloud.Pos.Y);
                 }
@@ -94,7 +103,7 @@ namespace WakeUpRainbow.Scenes
                 if (_cloud.Pos.Y >= 0)
                 {
                     _cloud.IsMovedY = true;
-                    _cloud.ToMove(Cloud.Move.Up);
+                    _cloud.ToMove(Cloud.Movement.Up);
                     if (_cloud.Pos.Y < 0)
                         _cloud.Pos = new Vector2(_cloud.Pos.X, 0);
                 }
@@ -105,7 +114,7 @@ namespace WakeUpRainbow.Scenes
                 if (_cloud.Pos.Y <= _mainGame.Graphics.PreferredBackBufferHeight - _cloud.Height)
                 {
                     _cloud.IsMovedY = true;
-                    _cloud.ToMove(Cloud.Move.Down);
+                    _cloud.ToMove(Cloud.Movement.Down);
                     if (_cloud.Pos.Y > _mainGame.Graphics.PreferredBackBufferHeight - _cloud.Height)
                         _cloud.Pos = new Vector2( _cloud.Pos.X, _mainGame.Graphics.PreferredBackBufferHeight - _cloud.Height);
                 }
@@ -117,9 +126,10 @@ namespace WakeUpRainbow.Scenes
             if (!_inputManager.KeyDown(Keys.Up) && !_inputManager.KeyDown(Keys.Down))
                 _cloud.IsMovedY = false;
 
-            if (_colorFoods.Count > 0)
+
+            foreach (ColorFood colorFood in _colorFoods)
             {
-                foreach (ColorFood colorFood in _colorFoods)
+                if (_colorFoods.Count > 0)
                 {
                     if (PhiloUtils.IsColide((int) _cloud.Pos.X, (int)_cloud.Pos.Y, _cloud.Width, _cloud.Height, (int)colorFood.Pos.X, (int)colorFood.Pos.Y, colorFood.Width, colorFood.Height))
                     {
@@ -151,17 +161,24 @@ namespace WakeUpRainbow.Scenes
                             _cloud.Color = Color.White;
                         }
 
-                        _entityManager.RemoveEntity(colorFood);
-                        _colorFoods.Remove(colorFood);
-                        _currentFoods = _colorFoods.Count;
-                        Debug.WriteLine($"_currentFoods = {_currentFoods}");
+                        RemoveColorFood(colorFood);
                         break;
                     }
 
+                    colorFood.Move();
+                    
+                    if (colorFood.Pos.X < 0)
+                    {
+                        RemoveColorFood(colorFood);
+                        break;
+                    }
                 }
             }
+
             if (_currentFoods < _maxCurrentFoods)
                 GenerateFoods(gameTime);
+
+
 
         }
 
@@ -197,12 +214,11 @@ namespace WakeUpRainbow.Scenes
             if (_currentTimeElapsed >= _nextSpawnColorTime)
             {
                 Random random = new Random(DateTime.Now.Millisecond);
-                ColorFood colorFood = ColorFood.CreateColorFood(_textureFood, _availableColors[random.Next(_availableColors.Count)], _mainGame.Graphics.PreferredBackBufferWidth, _mainGame.Graphics.PreferredBackBufferHeight);
+                ColorFood colorFood = ColorFood.CreateColorFood(_texture, _availableColors[random.Next(_availableColors.Count)], _mainGame.Graphics.PreferredBackBufferWidth, _mainGame.Graphics.PreferredBackBufferHeight);
                 _colorFoods.Add(colorFood);
                 _entityManager.AddEntity(colorFood);
                 _currentTimeElapsed = 0;
                 _currentFoods = _colorFoods.Count;
-                Debug.WriteLine($"_currentFoods = {_currentFoods}");
                 _nextSpawnColorTime = random.Next(1000, 4500);
 
             }
@@ -225,8 +241,14 @@ namespace WakeUpRainbow.Scenes
                 }
             }
 
-            Debug.WriteLine("ERROR : GetCombination => Color not found");
             return Color.Transparent;
+        }
+
+        private void RemoveColorFood(ColorFood colorFood)
+        {
+            _entityManager.RemoveEntity(colorFood);
+            _colorFoods.Remove(colorFood);
+            _currentFoods = _colorFoods.Count;
         }
 
 
