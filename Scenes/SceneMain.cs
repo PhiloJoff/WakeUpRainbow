@@ -16,8 +16,12 @@ namespace WakeUpRainbow.Scenes
     public class SceneMain : Scene
     {
 
+        //Entities
+        private ScoreBoard _scoreBoard;
         protected Cloud _cloud;
         protected List<ColorFood> _colorFoods;
+
+        //Entities features
         private List<Color> _availableColors;
         private readonly int _maxCurrentFoods = 3;
         private int _currentFoods = 0;
@@ -26,18 +30,17 @@ namespace WakeUpRainbow.Scenes
         private int _nextSpawnColorTime = 0;
         private int _currentTimeElapsed = 0;
 
+        // Usefull variables
         private Texture2D _texture;
-
-        //Combinaison de couleur possible
-        private Dictionary<string, List<Color>> _colorCombinations;
-
         private Color[] _eatColors;
+        private Rectangle _gameplayZone;
+
+        //Combinations possibilitys
+        private Dictionary<string, List<Color>> _colorCombinations;
         
         private List<Color> _eatColorsOrder;
         private List<Color> _eatColorsCurrent;
 
-
-        private ScoreBoard _scoreBoard;
         public SceneMain(MainGame mainGame) : base(mainGame)
         {
             _texture = PhiloUtils.CreateTexture2D(mainGame.GraphicsDevice, 30, 30, Color.White);
@@ -52,6 +55,7 @@ namespace WakeUpRainbow.Scenes
 
             _availableColors = new List<Color> { Color.Red, Color.Blue, Color.Green };
 
+            _gameplayZone = new Rectangle(0, _scoreBoard.Height, mainGame.Graphics.PreferredBackBufferWidth, mainGame.Graphics.PreferredBackBufferHeight - _scoreBoard.Height);
             _eatColors = new Color[2];
             //initialisation des couleurs
             _initCombination();
@@ -78,45 +82,45 @@ namespace WakeUpRainbow.Scenes
 
             if (_inputManager.KeyDown(Keys.Left))
             {
-                if (_cloud.Pos.X >= 0)
+                if (_cloud.Pos.X >= _gameplayZone.Left)
                 {
                     _cloud.IsMovedX = true;
                     _cloud.ToMove(Cloud.Movement.Left);
-                    if (_cloud.Pos.X < 0)
-                        _cloud.Pos = new Vector2(0, _cloud.Pos.Y);
+                    if (_cloud.Pos.X < _gameplayZone.Left)
+                        _cloud.Pos = new Vector2(_gameplayZone.Left, _cloud.Pos.Y);
                 }
             }
 
             if (_inputManager.KeyDown(Keys.Right))
             {
-                if (_cloud.Pos.X <= _mainGame.Graphics.PreferredBackBufferWidth - _cloud.Width)
+                if (_cloud.Pos.X <= _gameplayZone.Right - _cloud.Width)
                 {
                     _cloud.IsMovedX = true;
                     _cloud.ToMove(Cloud.Movement.Right);
-                    if (_cloud.Pos.X > _mainGame.Graphics.PreferredBackBufferWidth - _cloud.Width)
-                        _cloud.Pos = new Vector2(_mainGame.Graphics.PreferredBackBufferWidth - _cloud.Width, _cloud.Pos.Y);
+                    if (_cloud.Pos.X > _gameplayZone.Right - _cloud.Width)
+                        _cloud.Pos = new Vector2(_gameplayZone.Right - _cloud.Width, _cloud.Pos.Y);
                 }
             }
 
             if (_inputManager.KeyDown(Keys.Up))
             {
-                if (_cloud.Pos.Y >= 0)
+                if (_cloud.Pos.Y >= _gameplayZone.Top)
                 {
                     _cloud.IsMovedY = true;
                     _cloud.ToMove(Cloud.Movement.Up);
-                    if (_cloud.Pos.Y < 0)
-                        _cloud.Pos = new Vector2(_cloud.Pos.X, 0);
+                    if (_cloud.Pos.Y < _gameplayZone.Top)
+                        _cloud.Pos = new Vector2(_cloud.Pos.X, _gameplayZone.Top);
                 }
             }
 
             if (_inputManager.KeyDown(Keys.Down))
             {
-                if (_cloud.Pos.Y <= _mainGame.Graphics.PreferredBackBufferHeight - _cloud.Height)
+                if (_cloud.Pos.Y <= _gameplayZone.Bottom - _cloud.Height)
                 {
                     _cloud.IsMovedY = true;
                     _cloud.ToMove(Cloud.Movement.Down);
-                    if (_cloud.Pos.Y > _mainGame.Graphics.PreferredBackBufferHeight - _cloud.Height)
-                        _cloud.Pos = new Vector2( _cloud.Pos.X, _mainGame.Graphics.PreferredBackBufferHeight - _cloud.Height);
+                    if (_cloud.Pos.Y > _gameplayZone.Bottom - _cloud.Height)
+                        _cloud.Pos = new Vector2( _cloud.Pos.X, _gameplayZone.Bottom - _cloud.Height);
                 }
             }
 
@@ -167,7 +171,7 @@ namespace WakeUpRainbow.Scenes
 
                     colorFood.Move();
                     
-                    if (colorFood.Pos.X < 0)
+                    if (colorFood.Pos.X < _gameplayZone.Left)
                     {
                         RemoveColorFood(colorFood);
                         break;
