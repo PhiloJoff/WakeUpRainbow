@@ -10,7 +10,7 @@ namespace WakeUpRainbow.Core
 {
     public abstract class GameEntity : IGameEntity
     {
-        public enum Move
+        public enum Movement
         {
             None,
             Left,
@@ -77,10 +77,9 @@ namespace WakeUpRainbow.Core
         public Rectangle Rectangle { get => _rectangle; set => _rectangle = value; }
 
 
-
-        public GameEntity(Texture2D texture2D)
+        public GameEntity()
         {
-            _texture2D = texture2D;
+            _texture2D = null;
             _width = 0;
             _height = 0;
             _pos = Vector2.Zero;
@@ -94,21 +93,14 @@ namespace WakeUpRainbow.Core
             _updateOrder = 0;
             _rectangle = new Rectangle((int)_pos.X, (int)_pos.Y, _width, _height);
         }
-        public GameEntity(Texture2D texture2D, int width, int height)
+        public GameEntity(Texture2D texture2D) : this()
         {
             _texture2D = texture2D;
+        }
+        public GameEntity(Texture2D texture2D, int width, int height) : this(texture2D)
+        {
             _width = width;
             _height = height;
-            _pos = Vector2.Zero;
-            _color = Color.White;
-            _rotation = 0;
-            _origin = Vector2.Zero;
-            _scale = 1.0f;
-            _spriteEffects = SpriteEffects.None;
-            _layerDepth = 0;
-            _drawOrder = 0;
-            _updateOrder = 0;
-            _rectangle = new Rectangle((int)_pos.X, (int)_pos.Y, _width, _height);
         }
 
         public virtual void Load()
