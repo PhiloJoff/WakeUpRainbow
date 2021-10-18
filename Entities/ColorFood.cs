@@ -68,5 +68,14 @@ namespace WakeUpRainbow.Entities
 
             return colorFood;
         }
+
+        public void Move()
+        {
+            _speedX += (_speedX * _acceleration);
+            if (_speedX > _speedMax)
+                _speedX = _speedMax;
+            _pos.X -= _speedX;
+        }
+
     }
 }
