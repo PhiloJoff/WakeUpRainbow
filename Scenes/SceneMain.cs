@@ -78,7 +78,7 @@ namespace WakeUpRainbow.Scenes
             base.Load();
             _entityManager.AddEntity(_cloud);
             _entityManager.AddEntity(_scoreBoard);
-            _font = _mainGame.Content.Load<SpriteFont>(@"Fonts\font_courier_new");
+            _font = _mainGame.Content.Load<SpriteFont>(@"Fonts\Courier_New");
         }
 
         public override void Unload()
