@@ -13,3 +13,10 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Fonts/Courier_New.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/Courier_New.spritefont
+
