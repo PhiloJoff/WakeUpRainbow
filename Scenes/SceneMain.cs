@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Content;
 using PhiloEngine;
 using PhiloEngine.src;
 using System;
@@ -34,6 +35,11 @@ namespace WakeUpRainbow.Scenes
         private Texture2D _texture;
         private Color[] _eatColors;
         private Rectangle _gameplayZone;
+        private SpriteFont _font;
+        private int _score;
+        private readonly int _colGameplayZone = 9;
+        private readonly int _rowGameplayZone = 9;
+        private Rectangle[,] _gridGameplayZone;
 
         //Combinations possibilitys
         private Dictionary<string, List<Color>> _colorCombinations;
@@ -57,7 +63,12 @@ namespace WakeUpRainbow.Scenes
 
             _gameplayZone = new Rectangle(0, _scoreBoard.Height, mainGame.Graphics.PreferredBackBufferWidth, mainGame.Graphics.PreferredBackBufferHeight - _scoreBoard.Height);
             _eatColors = new Color[2];
-            //initialisation des couleurs
+
+            _gridGameplayZone = new Rectangle[_colGameplayZone, _rowGameplayZone];
+
+            //initialization grid gameplay
+
+            //initialization color
             _initCombination();
             Load();
         }
@@ -67,6 +78,7 @@ namespace WakeUpRainbow.Scenes
             base.Load();
             _entityManager.AddEntity(_cloud);
             _entityManager.AddEntity(_scoreBoard);
+            _font = _mainGame.Content.Load<SpriteFont>(@"Fonts\font_courier_new");
         }
 
         public override void Unload()
@@ -189,6 +201,7 @@ namespace WakeUpRainbow.Scenes
         public override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
+            DrawScore(_spriteBatch, _font, _score);
         }
 
         private void _initCombination()
@@ -253,6 +266,11 @@ namespace WakeUpRainbow.Scenes
             _entityManager.RemoveEntity(colorFood);
             _colorFoods.Remove(colorFood);
             _currentFoods = _colorFoods.Count;
+        }
+
+        private void DrawScore(SpriteBatch spriteBatch, SpriteFont font, int score)
+        {
+            spriteBatch.DrawString(font, $"SCORE : {score}", Vector2.Zero, Color.White);
         }
 
 
