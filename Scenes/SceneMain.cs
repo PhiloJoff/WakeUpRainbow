@@ -37,6 +37,7 @@ namespace WakeUpRainbow.Scenes
         private Rectangle _gameplayZone;
         private SpriteFont _font;
         private int _score;
+        private Vector2 _scorePos;
         private readonly int _colGameplayZone = 9;
         private readonly int _rowGameplayZone = 9;
         private Rectangle[,] _gridGameplayZone;
@@ -66,6 +67,8 @@ namespace WakeUpRainbow.Scenes
             _eatColors = new Color[2];
 
             _gridGameplayZone = new Rectangle[_colGameplayZone, _rowGameplayZone];
+
+            _scorePos = new Vector2(_scoreBoard.Pos.X + 20, _scoreBoard.Pos.Y + 3);
 
             //initialization grid gameplay
             InitGridGameplayZone(mainGame.Graphics.PreferredBackBufferWidth, mainGame.Graphics.PreferredBackBufferHeight, _colGameplayZone, _rowGameplayZone);
@@ -228,7 +231,7 @@ namespace WakeUpRainbow.Scenes
         
         private void DrawScore(SpriteBatch spriteBatch, SpriteFont font, int score)
         {
-            spriteBatch.DrawString(font, $"SCORE : {score}", Vector2.One, Color.White);
+            spriteBatch.DrawString(font, $"SCORE : {score} pts", _scorePos, Color.White);
         }
 
         private void InitGridGameplayZone(int width, int height, int cols, int rows)
@@ -256,14 +259,17 @@ namespace WakeUpRainbow.Scenes
                         {
                             _eatColors[0] = colorFood.Color;
                             _cloud.Color = colorFood.Color;
+                            _score += 10;
                         }
                         else
                         {
                             _eatColors[1] = colorFood.Color;
+                            _score += 10;
                             Color combinationColor = GetCombination(_eatColors);
                             if (!_availableColors.Contains(combinationColor) && combinationColor != Color.Transparent)
                             {
                                 _availableColors.Add(combinationColor);
+                                _score += 5;
 
                                 if (combinationColor == _eatColorsOrder[_eatColorsCurrent.Count])
                                 {
