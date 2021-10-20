@@ -67,6 +67,7 @@ namespace WakeUpRainbow.Scenes
             _gridGameplayZone = new Rectangle[_colGameplayZone, _rowGameplayZone];
 
             //initialization grid gameplay
+            InitGridGameplayZone(mainGame.Graphics.PreferredBackBufferWidth, mainGame.Graphics.PreferredBackBufferHeight, _colGameplayZone, _rowGameplayZone);
 
             //initialization color
             _initCombination();
@@ -142,54 +143,8 @@ namespace WakeUpRainbow.Scenes
             if (!_inputManager.KeyDown(Keys.Up) && !_inputManager.KeyDown(Keys.Down))
                 _cloud.IsMovedY = false;
 
-
-            foreach (ColorFood colorFood in _colorFoods)
-            {
-                if (_colorFoods.Count > 0)
-                {
-                    if (PhiloUtils.IsColide((int) _cloud.Pos.X, (int)_cloud.Pos.Y, _cloud.Width, _cloud.Height, (int)colorFood.Pos.X, (int)colorFood.Pos.Y, colorFood.Width, colorFood.Height))
-                    {
-
-                        // Check if the first element is null (== Color.Transparent)
-                        if (_eatColors[0] == Color.Transparent)
-                        {
-                            _eatColors[0] = colorFood.Color;
-                            _cloud.Color = colorFood.Color;
-                        }
-                        else
-                        {
-                            _eatColors[1] = colorFood.Color;
-                            Color combinationColor = GetCombination(_eatColors);
-                            if (!_availableColors.Contains(combinationColor) && combinationColor != Color.Transparent)
-                            {
-                                _availableColors.Add(combinationColor);
-
-                                if (combinationColor == _eatColorsOrder[_eatColorsCurrent.Count])
-                                {
-                                    _eatColorsCurrent.Add(combinationColor);
-
-                                }
-                                Debug.WriteLine(_eatColorsCurrent.Count);
-                            }
-
-                            //Reinitialize the array of eatFood
-                            _eatColors = new Color[2];
-                            _cloud.Color = Color.White;
-                        }
-
-                        RemoveColorFood(colorFood);
-                        break;
-                    }
-
-                    colorFood.Move();
-                    
-                    if (colorFood.Pos.X < _gameplayZone.Left)
-                    {
-                        RemoveColorFood(colorFood);
-                        break;
-                    }
-                }
-            }
+            ColorFoodCollision();
+            
 
             if (_currentFoods < _maxCurrentFoods)
                 GenerateFoods(gameTime);
@@ -197,6 +152,8 @@ namespace WakeUpRainbow.Scenes
 
 
         }
+
+        
 
         public override void Draw(GameTime gameTime)
         {
@@ -267,12 +224,73 @@ namespace WakeUpRainbow.Scenes
             _colorFoods.Remove(colorFood);
             _currentFoods = _colorFoods.Count;
         }
-
+        
         private void DrawScore(SpriteBatch spriteBatch, SpriteFont font, int score)
         {
-            spriteBatch.DrawString(font, $"SCORE : {score}", Vector2.Zero, Color.White);
+            spriteBatch.DrawString(font, $"SCORE : {score}", Vector2.One, Color.White);
         }
 
+        private void InitGridGameplayZone(int width, int height, int cols, int rows)
+        {
+            for (int x = 0; x < cols; x ++)
+            {
+                for (int y = 0; y < rows ; y++)
+                {
+                    _gridGameplayZone[x, y] = new Rectangle(x / cols * width, y / rows * height, 1 / cols * width, 1 / rows * height);
+                }
+            }
+        }
+
+        private void ColorFoodCollision()
+        {
+            foreach (ColorFood colorFood in _colorFoods)
+            {
+                if (_colorFoods.Count > 0)
+                {
+                    if (PhiloUtils.IsColide((int)_cloud.Pos.X, (int)_cloud.Pos.Y, _cloud.Width, _cloud.Height, (int)colorFood.Pos.X, (int)colorFood.Pos.Y, colorFood.Width, colorFood.Height))
+                    {
+
+                        // Check if the first element is null (== Color.Transparent)
+                        if (_eatColors[0] == Color.Transparent)
+                        {
+                            _eatColors[0] = colorFood.Color;
+                            _cloud.Color = colorFood.Color;
+                        }
+                        else
+                        {
+                            _eatColors[1] = colorFood.Color;
+                            Color combinationColor = GetCombination(_eatColors);
+                            if (!_availableColors.Contains(combinationColor) && combinationColor != Color.Transparent)
+                            {
+                                _availableColors.Add(combinationColor);
+
+                                if (combinationColor == _eatColorsOrder[_eatColorsCurrent.Count])
+                                {
+                                    _eatColorsCurrent.Add(combinationColor);
+
+                                }
+                                Debug.WriteLine(_eatColorsCurrent.Count);
+                            }
+
+                            //Reinitialize the array of eatFood
+                            _eatColors = new Color[2];
+                            _cloud.Color = Color.White;
+                        }
+
+                        RemoveColorFood(colorFood);
+                        break;
+                    }
+
+                    colorFood.Move();
+
+                    if (colorFood.Pos.X < _gameplayZone.Left)
+                    {
+                        RemoveColorFood(colorFood);
+                        break;
+                    }
+                }
+            }
+        }
 
 
     }
