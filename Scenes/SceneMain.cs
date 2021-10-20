@@ -49,11 +49,13 @@ namespace WakeUpRainbow.Scenes
 
         public SceneMain(MainGame mainGame) : base(mainGame)
         {
-            _texture = PhiloUtils.CreateTexture2D(mainGame.GraphicsDevice, 30, 30, Color.White);
-            _cloud = new Cloud(_texture, _texture.Width, _texture.Height);
-
             _texture = PhiloUtils.CreateBorderTexture2D(mainGame.GraphicsDevice, mainGame.Graphics.PreferredBackBufferWidth, 30, Color.Transparent, Color.White, 3);
             _scoreBoard = new ScoreBoard(_texture, _texture.Width, _texture.Height);
+
+            _gameplayZone = new Rectangle(0, _scoreBoard.Height, mainGame.Graphics.PreferredBackBufferWidth, mainGame.Graphics.PreferredBackBufferHeight - _scoreBoard.Height);
+
+            _texture = PhiloUtils.CreateTexture2D(mainGame.GraphicsDevice, 30, 30, Color.White);
+            _cloud = new Cloud(_texture, _texture.Width, _texture.Height, new Vector2(0, _scoreBoard.Height));
 
             _colorFoods = new List<ColorFood>();
             _texture = PhiloUtils.CreateTexture2D(mainGame.GraphicsDevice, ColorFood.defaultWidth, ColorFood.defaultHeight);
@@ -61,7 +63,6 @@ namespace WakeUpRainbow.Scenes
 
             _availableColors = new List<Color> { Color.Red, Color.Blue, Color.Green };
 
-            _gameplayZone = new Rectangle(0, _scoreBoard.Height, mainGame.Graphics.PreferredBackBufferWidth, mainGame.Graphics.PreferredBackBufferHeight - _scoreBoard.Height);
             _eatColors = new Color[2];
 
             _gridGameplayZone = new Rectangle[_colGameplayZone, _rowGameplayZone];
