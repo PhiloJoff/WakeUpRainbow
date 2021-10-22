@@ -14,6 +14,11 @@ namespace WakeUpRainbow.Entities
             _pos = pos;
         }
 
-
+        public override string ToString()
+        {
+            return $"Cellbox : Pos {_pos.ToString()}";
+        }
     }
+
+    
 }
