@@ -40,7 +40,7 @@ namespace WakeUpRainbow.Scenes
         private Vector2 _scorePos;
         private readonly int _colGameplayZone = 9;
         private readonly int _rowGameplayZone = 9;
-        private Rectangle[,] _gridGameplayZone;
+        private CellBox[,] _gridGameplayZone;
 
         //Combinations possibilitys
         private Dictionary<string, List<Color>> _colorCombinations;
@@ -59,19 +59,18 @@ namespace WakeUpRainbow.Scenes
             _cloud = new Cloud(_texture, _texture.Width, _texture.Height, new Vector2(0, _scoreBoard.Height));
 
             _colorFoods = new List<ColorFood>();
-            _texture = PhiloUtils.CreateTexture2D(mainGame.GraphicsDevice, ColorFood.defaultWidth, ColorFood.defaultHeight);
 
 
             _availableColors = new List<Color> { Color.Red, Color.Blue, Color.Green };
 
             _eatColors = new Color[2];
 
-            _gridGameplayZone = new Rectangle[_colGameplayZone, _rowGameplayZone];
+            _gridGameplayZone = new CellBox[_colGameplayZone, _rowGameplayZone];
 
             _scorePos = new Vector2(_scoreBoard.Pos.X + 20, _scoreBoard.Pos.Y + 3);
 
             //initialization grid gameplay
-            InitGridGameplayZone(mainGame.Graphics.PreferredBackBufferWidth, mainGame.Graphics.PreferredBackBufferHeight, _colGameplayZone, _rowGameplayZone);
+            InitGridGameplayZone(_gameplayZone.Width, _gameplayZone.Height, _colGameplayZone, _rowGameplayZone);
 
             //initialization color
             _initCombination();
@@ -157,8 +156,6 @@ namespace WakeUpRainbow.Scenes
 
         }
 
-        
-
         public override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
@@ -189,10 +186,11 @@ namespace WakeUpRainbow.Scenes
         private void GenerateFoods(GameTime gameTime)
         {
             _currentTimeElapsed += gameTime.ElapsedGameTime.Milliseconds;
+            _texture = PhiloUtils.CreateTexture2D(_mainGame.GraphicsDevice, ColorFood.defaultWidth, ColorFood.defaultHeight);
             if (_currentTimeElapsed >= _nextSpawnColorTime)
             {
                 Random random = new Random(DateTime.Now.Millisecond);
-                ColorFood colorFood = ColorFood.CreateColorFood(_texture, _availableColors[random.Next(_availableColors.Count)], _mainGame.Graphics.PreferredBackBufferWidth, _mainGame.Graphics.PreferredBackBufferHeight);
+                ColorFood colorFood = ColorFood.CreateColorFood(_texture, _availableColors[random.Next(_availableColors.Count)], _gameplayZone.Width, _gameplayZone.Height);
                 _colorFoods.Add(colorFood);
                 _entityManager.AddEntity(colorFood);
                 _currentTimeElapsed = 0;
@@ -204,7 +202,11 @@ namespace WakeUpRainbow.Scenes
         }
 
 
-        //Return Color.Transparent if combination is not available
+        /// <summary>
+        /// Return Color combination available
+        /// </summary>
+        /// <param name="colors">Array with 2 colors to combinate</param>
+        /// <returns>Return the combination color if avaible</returns>
         private Color GetCombination(Color[] colors)
         {
             if (colors.Length != 2)
@@ -234,13 +236,29 @@ namespace WakeUpRainbow.Scenes
             spriteBatch.DrawString(font, $"SCORE : {score} pts", _scorePos, Color.White);
         }
 
+        /// <summary>
+        /// Initialize the grid gameplay zone
+        /// </summary>
+        /// <param name="width">width of the gameplayzone</param>
+        /// <param name="height">height of the gameplayzone</param>
+        /// <param name="cols">number of columns in the gameplayzone</param>
+        /// <param name="rows">number of rows in the gameplayzone</param>
         private void InitGridGameplayZone(int width, int height, int cols, int rows)
         {
+            int cellWidth = (int)((1f / cols) * width);
+            int cellHeigth = (int)((1f / rows) * height);
+            Texture2D cellTexture = PhiloUtils.CreateBorderTexture2D(_mainGame.GraphicsDevice, cellWidth, cellHeigth, Color.Transparent, Color.White, 1);
             for (int x = 0; x < cols; x ++)
             {
                 for (int y = 0; y < rows ; y++)
                 {
-                    _gridGameplayZone[x, y] = new Rectangle(x / cols * width, y / rows * height, 1 / cols * width, 1 / rows * height);
+                    Vector2 cellPos = new Vector2(_gameplayZone.X, _gameplayZone.Y) + new Vector2((float) x / cols * width, (float) y / rows * height);
+                    _gridGameplayZone[x, y] = new CellBox(cellTexture, cellWidth, cellHeigth, cellPos)
+                    {
+                        Rectangle = new Rectangle(x / cols * width, y / rows * height, cellWidth, cellHeigth)
+                    };
+
+                    _entityManager.AddEntity(_gridGameplayZone[x, y]);
                 }
             }
         }
