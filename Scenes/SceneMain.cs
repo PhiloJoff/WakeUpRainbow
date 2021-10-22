@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using WakeUpRainbow.Entities;
+using WakeUpRainbow.Core;
 
 namespace WakeUpRainbow.Scenes
 {
@@ -41,6 +42,7 @@ namespace WakeUpRainbow.Scenes
         private readonly int _colGameplayZone = 9;
         private readonly int _rowGameplayZone = 9;
         private CellBox[,] _gridGameplayZone;
+        private CellBox _lastCellBox;
 
         //Combinations possibilitys
         private Dictionary<string, List<Color>> _colorCombinations;
@@ -68,6 +70,9 @@ namespace WakeUpRainbow.Scenes
             _gridGameplayZone = new CellBox[_colGameplayZone, _rowGameplayZone];
 
             _scorePos = new Vector2(_scoreBoard.Pos.X + 20, _scoreBoard.Pos.Y + 3);
+
+            //lastcellbox init
+            _lastCellBox = new CellBox();
 
             //initialization grid gameplay
             InitGridGameplayZone(_gameplayZone.Width, _gameplayZone.Height, _colGameplayZone, _rowGameplayZone);
@@ -145,7 +150,8 @@ namespace WakeUpRainbow.Scenes
 
             if (!_inputManager.KeyDown(Keys.Up) && !_inputManager.KeyDown(Keys.Down))
                 _cloud.IsMovedY = false;
-
+            
+            
             ColorFoodCollision();
             
 
@@ -303,6 +309,8 @@ namespace WakeUpRainbow.Scenes
                         }
 
                         RemoveColorFood(colorFood);
+                        DetectPosCell(_cloud);
+
                         break;
                     }
 
@@ -317,6 +325,24 @@ namespace WakeUpRainbow.Scenes
             }
         }
 
+
+        private CellBox DetectPosCell(GameEntity entity)
+        {
+
+            for (int x = 0; x < _gridGameplayZone.GetLength(0); x++)
+            {
+                for (int y = 0; y < _gridGameplayZone.GetLength(1); y++)
+
+                    if (PhiloUtils.IsColide((int)entity.Pos.X, (int)entity.Pos.Y, entity.Width, entity.Height, 
+                            (int)_gridGameplayZone[x,y].Pos.X, (int)_gridGameplayZone[x, y].Pos.Y, _gridGameplayZone[x, y].Width, _gridGameplayZone[x, y].Height))
+                    {
+                        Debug.WriteLine($"[{x},{y}] {_gridGameplayZone[x, y]}");
+                        return _gridGameplayZone[x, y];
+                    }
+            }
+
+            return null;
+        }
 
     }
 }
