@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PhiloEngine.src;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,6 +20,7 @@ namespace WakeUpRainbow.Entities
             _width = defaultWidth;
             _height = defaultHeight;
             _isActive = true;
+            _speedMax = (float) PhiloUtils.RandomDouble((double) (_speedMax - 9),(double) (_speedMax + 2));
         }
 
         public ColorFood(Texture2D texture2D, Vector2 pos) : base(texture2D)
@@ -27,6 +29,7 @@ namespace WakeUpRainbow.Entities
             _height = defaultHeight;
             _pos = pos;
             _isActive = true;
+            _speedMax = (float)PhiloUtils.RandomDouble((double)(_speedMax - 9), (double)(_speedMax + 2));
         }
         public ColorFood(Texture2D texture2D, Vector2 pos, Color color) : this(texture2D, pos)
         {
