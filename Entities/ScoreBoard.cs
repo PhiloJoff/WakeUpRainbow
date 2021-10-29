@@ -10,6 +10,8 @@ namespace WakeUpRainbow.Entities
     {
         private string _score;
         public string Score { get => _score; set => _score = value; }
+
+        private List<GameEntity> _entities;
         public ScoreBoard() : base()
         {
         }

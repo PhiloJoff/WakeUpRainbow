@@ -241,7 +241,7 @@ namespace WakeUpRainbow.Scenes
         {
             spriteBatch.DrawString(font, $"SCORE : {score} pts", _scorePos, Color.White);
         }
-
+ 
         /// <summary>
         /// Initialize the grid gameplay zone
         /// </summary>
