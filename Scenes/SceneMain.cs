@@ -53,7 +53,7 @@ namespace WakeUpRainbow.Scenes
         public SceneMain(MainGame mainGame) : base(mainGame)
         {
             _texture = PhiloUtils.CreateBorderTexture2D(mainGame.GraphicsDevice, mainGame.Graphics.PreferredBackBufferWidth, 30, Color.Transparent, Color.White, 3);
-            _scoreBoard = new ScoreBoard(_texture, _texture.Width, _texture.Height);
+            _scoreBoard = new ScoreBoard(mainGame.GraphicsDevice, _texture, _texture.Width, _texture.Height);
 
             _gameplayZone = new Rectangle(0, _scoreBoard.Height, mainGame.Graphics.PreferredBackBufferWidth, mainGame.Graphics.PreferredBackBufferHeight - _scoreBoard.Height);
 
